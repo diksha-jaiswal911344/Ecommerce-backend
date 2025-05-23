@@ -43,9 +43,6 @@ public class User {
     @Column(nullable = false)
     private RoleType role;
 
-    @Column(name = "phone_no")
-    private String phoneNo;
-
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -69,8 +66,8 @@ public class User {
     private Gender gender;
 
     //String can cause parsing issues and bad format validation. So we will stick to LocalDate for all date values without time.
-    @Column(name = "dob")
-    private LocalDate dateOfBirth;
+    @Column(name = "age")
+    private Integer age;
 
     //since we plan to support refresh token revocation or multiple device logins
     @Column(name = "refresh_token_hash")

@@ -1,5 +1,6 @@
 package com.ql.ecommerce_backend.security;
 
+import com.ql.ecommerce_backend.exceptions.JwtAuthenticationException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,9 +18,11 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider tokenProvider;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
-    public JwtAuthenticationFilter(JwtTokenProvider tokenProvider) {
+    public JwtAuthenticationFilter(JwtTokenProvider tokenProvider, CustomAuthenticationEntryPoint authenticationEntryPoint) {
         this.tokenProvider = tokenProvider;
+        this.authenticationEntryPoint = authenticationEntryPoint;
     }
 
     @Override
@@ -28,17 +31,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String jwt = getJwtFromRequest(request);
 
-            if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt) && !tokenProvider.isRefreshToken(jwt)) {
+            if (StringUtils.hasText(jwt)) {
+                if (!tokenProvider.validateToken(jwt)) {
+                    throw new JwtAuthenticationException("Invalid or expired JWT token") {};
+                }
+
+                if (tokenProvider.isRefreshToken(jwt)) {
+                    throw new org.springframework.security.core.AuthenticationException("Refresh token cannot be used here") {};
+                }
+
                 String username = tokenProvider.getUsernameFromToken(jwt);
 
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         username, null, tokenProvider.getAuthoritiesFromToken(jwt));
-
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
+        } catch (org.springframework.security.core.AuthenticationException ex) {
+            authenticationEntryPoint.commence(request, response, ex);
+            return;
         } catch (Exception ex) {
-            logger.error("Could not set user authentication in security context", ex);
+            throw new org.springframework.security.core.AuthenticationException("Unexpected error during authentication: " + ex.getMessage()) {};
         }
 
         filterChain.doFilter(request, response);

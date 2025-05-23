@@ -2,6 +2,7 @@ package com.ql.ecommerce_backend.dto.mapper;
 
 import com.ql.ecommerce_backend.dto.request.OnboardingRequest;
 import com.ql.ecommerce_backend.dto.request.SignupRequest;
+import com.ql.ecommerce_backend.dto.response.ProfileResponse;
 import com.ql.ecommerce_backend.entity.User;
 import com.ql.ecommerce_backend.enums.AccountStatus;
 import com.ql.ecommerce_backend.enums.RoleType;
@@ -13,6 +14,14 @@ public class UserMapper {
 
     private final PasswordEncoder passwordEncoder;
 
+    public ProfileResponse toProfileResponse(User user) {
+        ProfileResponse response = new ProfileResponse();
+        response.setFirstName(user.getFirstName());
+        response.setLastName(user.getLastName());
+        response.setAge(user.getAge());
+        response.setGender(user.getGender());
+        return response;
+    }
     public UserMapper(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
     }
@@ -31,7 +40,7 @@ public class UserMapper {
         user.setFirstName(onboardingRequest.getFirstName());
         user.setLastName(onboardingRequest.getLastName());
         user.setGender(onboardingRequest.getGender());
-        user.setDateOfBirth(onboardingRequest.getDob());
+        user.setAge(onboardingRequest.getAge());
         user.setName(onboardingRequest.getFirstName() + " " + onboardingRequest.getLastName());
         user.setAccountStatus(AccountStatus.ACTIVE);
     }

@@ -25,11 +25,11 @@ public class UserAddress {
     @Column(name = "address_type")
     private String addressType;
 
-    @Column(name = "lane1")
-    private String lane1;
+    @Column(name = "addressLine1")
+    private String addressLine1;
 
-    @Column(name = "lane2")
-    private String lane2;
+    @Column(name = "addressLine2")
+    private String addressLine2;
 
     @Column(name = "city")
     private String city;
@@ -37,12 +37,12 @@ public class UserAddress {
     @Column(name = "state")
     private String state;
 
-    @Column(name = "postal_code")
-    private String postalCode;
+    @Column(name = "zipCode")
+    private String zipCode;
 
     @Column(name = "country")
     private String country;
 
-    @Column(name = "is_default")
+    @Column(name = "isDefault")
     private Boolean isDefault = false;
 }

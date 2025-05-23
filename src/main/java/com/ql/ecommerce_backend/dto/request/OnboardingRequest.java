@@ -26,7 +26,6 @@ public class OnboardingRequest {
 
     private Gender gender;
 
-    @NotNull(message = "Date of birth is required")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    private LocalDate dob;
+    @NotNull(message = "Age of birth is required")
+    private Integer age;
 }

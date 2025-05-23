@@ -1,5 +1,6 @@
 package com.ql.ecommerce_backend.config;
 
+import com.ql.ecommerce_backend.security.CustomAuthenticationEntryPoint;
 import com.ql.ecommerce_backend.security.CustomUserDetailsService;
 import com.ql.ecommerce_backend.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
@@ -33,12 +34,23 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http,JwtAuthenticationFilter jwtAuthenticationFilter,AuthenticationProvider authenticationProvider) throws Exception {
+    public CustomAuthenticationEntryPoint customAuthenticationEntryPoint() {
+        return new CustomAuthenticationEntryPoint();
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http,
+                                           JwtAuthenticationFilter jwtAuthenticationFilter,
+                                           AuthenticationProvider authenticationProvider,
+                                           CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/signup/**", "/api/auth/signin/**").permitAll()
+                        .requestMatchers("/api/auth/signup/**", "/api/auth/signin/**","/api/categories/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/seller/**").hasRole("SELLER")
                         .requestMatchers("/api/buyer/**").hasRole("BUYER")
@@ -48,6 +60,7 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+
     @Bean
     public AuthenticationProvider authenticationProvider(CustomUserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();

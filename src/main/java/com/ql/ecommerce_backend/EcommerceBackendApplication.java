@@ -11,6 +11,4 @@ public class EcommerceBackendApplication {
 	SpringApplication.run(EcommerceBackendApplication.class, args);
 	}
 
-
-
 }
